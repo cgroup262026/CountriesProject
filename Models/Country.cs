@@ -26,8 +26,8 @@
             FlagImageURL = flagImageURL;
             Currency = currency;
             RegionID = regionID;
-            OfficialLanguage = officialLanguage;
-            BorderCountries = borderCountries;
+            OfficialLanguage = new List<Language>();
+            BorderCountries = new List<Country>();
         }
 
         public string CountryCode { get => countryCode; set => countryCode = value; }
