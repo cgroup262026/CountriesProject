@@ -13,6 +13,8 @@
             Symbol = symbol;
         }
 
+        public Currency() { }
+
         public string CurrencyCode { get => currencyCode; set => currencyCode = value; }
         public string CurrencyName { get => currencyName; set => currencyName = value; }
         public string Symbol { get => symbol; set => symbol = value; }
