@@ -2,13 +2,34 @@
 {
     public class MemoryGameResult
     {
-        public int ResultId { get; set; }
-        public int UserId { get; set; }
-        public User user { get; set; }
-        public int? Points { get; set; }
-        public int? Moves { get; set; }
-        public int? MatchedPairs { get; set; }
-        public bool? IsCompleted { get; set; }
-        public DateTime PlayDate { get; set; }
+        int resultId;
+        int userId;
+        User user;
+        int? points;
+        int? moves;
+        int? matchedPairs;
+        bool? isCompleted;
+        DateTime playDate;
+
+        public MemoryGameResult(int resultId, int userId, User user, int? points, int? moves, int? matchedPairs, bool? isCompleted, DateTime playDate)
+        {
+            ResultId = resultId;
+            UserId = userId;
+            User = user;
+            Points = points;
+            Moves = moves;
+            MatchedPairs = matchedPairs;
+            IsCompleted = isCompleted;
+            PlayDate = playDate;
+        }
+
+        public int ResultId { get => resultId; set => resultId = value; }
+        public int UserId { get => userId; set => userId = value; }
+        public User User { get => user; set => user = value; }
+        public int? Points { get => points; set => points = value; }
+        public int? Moves { get => moves; set => moves = value; }
+        public int? MatchedPairs { get => matchedPairs; set => matchedPairs = value; }
+        public bool? IsCompleted { get => isCompleted; set => isCompleted = value; }
+        public DateTime PlayDate { get => playDate; set => playDate = value; }
     }
 }
