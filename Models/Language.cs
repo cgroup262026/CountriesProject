@@ -11,6 +11,8 @@
             LanguageName = languageName;
         }
 
+        public Language() { }
+
         public string LanguageCode { get => languageCode; set => languageCode = value; }
         public string LanguageName { get => languageName; set => languageName = value; }
     }

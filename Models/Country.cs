@@ -41,6 +41,7 @@ namespace CountriesProject.Models
             Borders = borders;
             Reviews = reviews;
         }
+        public Country() { }
 
         public string Alpha3Code { get => alpha3Code; set => alpha3Code = value; }
         public string Alpha2Code { get => alpha2Code; set => alpha2Code = value; }
