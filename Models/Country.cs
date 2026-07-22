@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.ViewEngines;
+﻿using CountriesProject.DAL;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
 
 namespace CountriesProject.Models
 {
@@ -57,5 +58,12 @@ namespace CountriesProject.Models
         public List<Language> Languages { get => languages; set => languages = value; }
         public List<Country> Borders { get => borders; set => borders = value; }
         public List<Review> Reviews { get => reviews; set => reviews = value; }
+
+
+        public int InsertCountries(List<Country> countries)
+        {
+            DBservices dbs = new DBservices();
+            return dbs.InsertCountriesToDB(countries);
+        }
     }
 }
