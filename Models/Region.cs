@@ -11,6 +11,8 @@
             RegionName = regionName;
         }
 
+        public Region() { }
+
         public int RegionId { get => regionId; set => regionId = value; }
         public string RegionName { get => regionName; set => regionName = value; }
     }
