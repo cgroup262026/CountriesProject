@@ -60,10 +60,35 @@ namespace CountriesProject.Models
         public List<Review> Reviews { get => reviews; set => reviews = value; }
 
 
-        public int InsertCountries(List<Country> countries)
+        public static int InsertCountries(List<Country> countries)
         {
             DBservices dbs = new DBservices();
-            return dbs.InsertCountriesToDB(countries);
+
+            foreach (Country country in countries)
+            {
+                country.RegionId = dbs.InsertRegion(country.Region);
+                dbs.InsertCountry(country);
+
+                foreach (Currency currency in country.Currencies)
+                {
+                    dbs.InsertCurrency(currency);
+                    dbs.InsertCountryCurrency(country.Alpha3Code, currency.CurrencyCode);
+                }
+
+                foreach (Language language in country.Languages)
+                {
+                    dbs.InsertLanguage(language);
+                    dbs.InsertCountryLanguage(country.Alpha3Code, language.LanguageCode);
+                }
+            }
+
+            foreach (Country country in countries)
+            {
+                foreach (Country border in country.Borders)
+                    dbs.InsertCountryBorder(country.Alpha3Code, border.Alpha3Code);
+            }
+
+            return countries.Count;
         }
     }
 }

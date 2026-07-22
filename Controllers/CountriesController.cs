@@ -24,14 +24,14 @@ namespace CountriesProject.Controllers
             return "value";
         }
 
-        // POST api/<CountriesController>
-        //[HttpPost]
-        //[Route("api/countries/add")]
-        //public bool Post([FromBody] Country country)
-        //{
-        //    Country c = new Country();
-        //    //return c.InsertCountry(country);
-        //}
+        //POST api/<CountriesController>
+        [HttpPost]
+        [Route("api/countries/add")]
+        public void Post([FromBody] Country country)
+        {
+            //Country c = new Country();
+            ////return c.InsertCountry(country);
+        }
 
         // PUT api/<CountriesController>/5
         [HttpPut("{id}")]
@@ -45,12 +45,10 @@ namespace CountriesProject.Controllers
         {
         }
 
-        [HttpPost]
-        [Route("api/countries/add")]
-        public void PostAllCountries([FromBody] List<Country> countries)
+        [HttpPost("addAllCountries")]
+        public int AddCountries([FromBody] List<Country> countries)
         {
-            Country c = new Country();
-            c.InsertCountries(countries);
+            return Country.InsertCountries(countries);
         }
     }
 }

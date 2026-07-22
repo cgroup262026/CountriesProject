@@ -31,85 +31,28 @@ namespace CountriesProject.DAL
             return con;
         }
 
-
-        //===============================================GAME===============================================
-
-        //--------------------------------------------------------------------------------------------------
-        // This method inserts a student to the students table 
-        // the model CCEC - Connect, Create Command, Execute, Close
-        //--------------------------------------------------------------------------------------------------
-        public int InsertCountriesToDB(List<Country> countries) //לשנות
+        public int InsertRegion(Region region)
         {
-            SqlConnection con = null;
-            int totalEffected = 0;
+            SqlConnection con;
+            SqlCommand cmd;
 
             try
             {
-                con = connect("myProjDB"); // פתיחת החיבור פעם אחת בלבד!
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
 
-                foreach (Country country in countries)
-                {
-                    // 1. שמירת המדינה
-                    Dictionary<string, object> paramDic = new Dictionary<string, object>();
-                    paramDic.Add("@Alpha3Code", country.Alpha3Code ?? (object)DBNull.Value);
-                    paramDic.Add("@Alpha2Code", country.Alpha2Code ?? (object)DBNull.Value);
-                    paramDic.Add("@CountryName", country.CountryName ?? (object)DBNull.Value);
-                    paramDic.Add("@Capital", country.Capital ?? (object)DBNull.Value);
-                    paramDic.Add("@RegionName", country.Region?.RegionName ?? (object)DBNull.Value);
-                    paramDic.Add("@SubRegion", country.SubRegion ?? (object)DBNull.Value);
-                    paramDic.Add("@Population", country.Population);
-                    paramDic.Add("@Area", country.Area);
-                    paramDic.Add("@FlagUrl", country.FlagUrl ?? (object)DBNull.Value);
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@RegionName", region.RegionName);
 
-                    SqlCommand cmd = CreateCommandWithStoredProcedureGeneral("SP_INSERT_COUNTRY", con, paramDic);
-                    totalEffected += cmd.ExecuteNonQuery();
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_INSERT_REGION_P", con, paramDic);
 
-                    // 2. שמירת השפות של אותה מדינה
-                    if (country.Languages != null)
-                    {
-                        foreach (Language lang in country.Languages)
-                        {
-                            Dictionary<string, object> langParams = new Dictionary<string, object>();
-                            langParams.Add("@Alpha3Code", country.Alpha3Code);
-                            langParams.Add("@LanguageName", lang.LanguageName);
-
-                            SqlCommand cmdLang = CreateCommandWithStoredProcedureGeneral("SP_ADD_COUNTRY_LANGUAGE", con, langParams);
-                            cmdLang.ExecuteNonQuery();
-                        }
-                    }
-
-                    // 3. שמירת המטבעות של אותה מדינה
-                    if (country.Currencies != null)
-                    {
-                        foreach (Currency curr in country.Currencies)
-                        {
-                            Dictionary<string, object> currParams = new Dictionary<string, object>();
-                            currParams.Add("@Alpha3Code", country.Alpha3Code);
-                            currParams.Add("@CurrencyCode", curr.CurrencyCode);
-                            currParams.Add("@CurrencyName", curr.CurrencyName ?? (object)DBNull.Value);
-                            currParams.Add("@CurrencySymbol", curr.Symbol ?? (object)DBNull.Value);
-
-                            SqlCommand cmdCurr = CreateCommandWithStoredProcedureGeneral("SP_ADD_COUNTRY_CURRENCY", con, currParams);
-                            cmdCurr.ExecuteNonQuery();
-                        }
-                    }
-
-                    // 4. שמירת הגבולות של אותה מדינה
-                    if (country.Borders != null)
-                    {
-                        foreach (Country border in country.Borders)
-                        {
-                            Dictionary<string, object> borderParams = new Dictionary<string, object>();
-                            borderParams.Add("@Alpha3Code", country.Alpha3Code);
-                            borderParams.Add("@BorderAlpha3Code", border.Alpha3Code);
-
-                            SqlCommand cmdBorder = CreateCommandWithStoredProcedureGeneral("SP_ADD_COUNTRY_BORDER", con, borderParams);
-                            cmdBorder.ExecuteNonQuery();
-                        }
-                    }
-                }
-
-                return totalEffected;
+            try
+            {
+                return Convert.ToInt32(cmd.ExecuteScalar());
             }
             catch (Exception ex)
             {
@@ -117,12 +60,235 @@ namespace CountriesProject.DAL
             }
             finally
             {
-                if (con != null)
-                {
-                    con.Close(); // סגירת החיבור בסיום כל הלולאה
-                }
+                if (con != null) con.Close();
             }
         }
+
+        public int InsertCountry(Country country)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@Alpha3Code", country.Alpha3Code);
+            paramDic.Add("@Alpha2Code", country.Alpha2Code);
+            paramDic.Add("@CountryName", country.CountryName);
+            paramDic.Add("@Capital", country.Capital);
+            paramDic.Add("@RegionID", country.RegionId);
+            paramDic.Add("@Subregion", country.SubRegion);
+            paramDic.Add("@Population", country.Population);
+            paramDic.Add("@Area", country.Area);
+            paramDic.Add("@FlagUrl", country.FlagUrl);
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_INSERT_COUNTRY_P", con, paramDic);
+
+            try
+            {
+                return cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (con != null) con.Close();
+            }
+        }
+
+        public int InsertCurrency(Currency currency)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@CurrencyCode", currency.CurrencyCode);
+            paramDic.Add("@CurrencyName", currency.CurrencyName);
+            paramDic.Add("@Symbol", currency.Symbol);
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_INSERT_CURRENCY_P", con, paramDic);
+
+            try
+            {
+                return cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (con != null) con.Close();
+            }
+        }
+
+        public int InsertCountryCurrency(string alpha3Code, string currencyCode)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@Alpha3Code", alpha3Code);
+            paramDic.Add("@CurrencyCode", currencyCode);
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_INSERT_COUNTRY_CURRENCY_P", con, paramDic);
+
+            try
+            {
+                return cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (con != null) con.Close();
+            }
+        }
+
+        public int InsertLanguage(Language language)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@LanguageCode", language.LanguageCode);
+            paramDic.Add("@LanguageName", language.LanguageName);
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_INSERT_LANGUAGE_P", con, paramDic);
+
+            try
+            {
+                return cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (con != null) con.Close();
+            }
+        }
+
+        public int InsertCountryLanguage(string alpha3Code, string languageCode)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@Alpha3Code", alpha3Code);
+            paramDic.Add("@LanguageCode", languageCode);
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_INSERT_COUNTRY_LANGUAGE_P", con, paramDic);
+
+            try
+            {
+                return cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (con != null) con.Close();
+            }
+        }
+
+        public int InsertCountryBorder(string alpha3Code, string borderAlpha3Code)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@Alpha3Code", alpha3Code);
+            paramDic.Add("@BorderAlpha3Code", borderAlpha3Code);
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_INSERT_COUNTRY_BORDER_P", con, paramDic);
+
+            try
+            {
+                return cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (con != null) con.Close();
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
