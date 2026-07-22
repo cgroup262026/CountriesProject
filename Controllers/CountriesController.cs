@@ -29,8 +29,7 @@ namespace CountriesProject.Controllers
         [Route("api/countries/add")]
         public void Post([FromBody] Country country)
         {
-            //Country c = new Country();
-            ////return c.InsertCountry(country);
+
         }
 
         // PUT api/<CountriesController>/5
@@ -43,12 +42,6 @@ namespace CountriesProject.Controllers
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
-        }
-
-        [HttpPost("addAllCountries")]
-        public int AddCountries([FromBody] List<Country> countries)
-        {
-            return Country.InsertCountries(countries);
         }
     }
 }
