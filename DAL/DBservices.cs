@@ -31,6 +31,133 @@ namespace CountriesProject.DAL
             return con;
         }
 
+        public int InsertUserToDB(User user)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+
+            paramDic.Add("@Email", user.Email);
+            paramDic.Add("@PasswordHash", user.PasswordHash);
+            paramDic.Add("@FullName", user.FullName);
+            paramDic.Add("@BirthDate", user.BirthDate);
+            paramDic.Add("@Gender", user.Gender);
+            paramDic.Add("@ImageUrl", string.IsNullOrEmpty(user.ImageUrl) ? DBNull.Value: user.ImageUrl);
+                   
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_INSERT_USER_P",con,paramDic);
+
+            try
+            {
+                int numEffected = cmd.ExecuteNonQuery();
+
+                return numEffected;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
+        }
+
+        public int InsertUserLoginToDB(int userId)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@UserID", userId);
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_INSERT_USER_LOGIN_P", con, paramDic);
+
+            try
+            {
+                return cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (con != null) con.Close();
+            }
+        }
+
+        public User GetUserByEmail(string email)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@Email", email);
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_GET_USER_BY_EMAIL_P", con, paramDic);
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+            try
+            {
+                if (dataReader.Read())
+                {
+                    User u = new User();
+                    u.UserId = Convert.ToInt32(dataReader["UserID"]);
+                    u.Email = dataReader["Email"].ToString();
+                    u.PasswordHash = dataReader["PasswordHash"].ToString();
+                    u.FullName = dataReader["FullName"].ToString();
+                    u.BirthDate = Convert.ToDateTime(dataReader["BirthDate"]);
+                    u.Gender = dataReader["Gender"].ToString();
+                    u.ImageUrl = dataReader["ImageUrl"] == DBNull.Value ? "" : dataReader["ImageUrl"].ToString();
+                    u.IsAdmin = Convert.ToBoolean(dataReader["IsAdmin"]);
+                    u.IsLocked = Convert.ToBoolean(dataReader["IsLocked"]);
+                    u.RegistrationDate = Convert.ToDateTime(dataReader["RegistrationDate"]);
+                    return u;
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (con != null) con.Close();
+            }
+        }
+
         //---------------------------------------------------------------------------------
         // Create the SqlCommand
         //---------------------------------------------------------------------------------

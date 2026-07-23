@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc.ViewEngines;
+﻿using CountriesProject.DAL;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
 using System.Diagnostics.Metrics;
 using System.Security.Cryptography.Xml;
 
@@ -13,8 +15,9 @@ namespace CountriesProject.Models
         DateTime birthDate;
         string gender;
         string imageUrl;
-        bool isAdmin = false;
-        bool isLocked = false;
+        bool isAdmin;
+        bool isLocked;
+        DateTime registrationDate;
 
         List<string> hobbies = new List<string>();
         List<UserLanguage> spokenLanguages = new List<UserLanguage>();
@@ -24,14 +27,13 @@ namespace CountriesProject.Models
 
         public User() { }
 
-        public User(string email, string passwordHash, string fullName, DateTime birthDate, string gender, string imageUrl)
+        public User(string email, string passwordHash, string fullName, DateTime birthDate, string gender)
         {
             Email = email;
             PasswordHash = passwordHash;
             FullName = fullName;
             BirthDate = birthDate;
             Gender = gender;
-            ImageUrl = imageUrl;
         }
 
         public int UserId { get => userId; set => userId = value; }
@@ -47,5 +49,30 @@ namespace CountriesProject.Models
         public List<UserLanguage> SpokenLanguages { get => spokenLanguages; set => spokenLanguages = value; }
         public List<string> FavoriteRegions { get => favoriteRegions; set => favoriteRegions = value; }
         public List<string> TravelPreferences { get => travelPreferences; set => travelPreferences = value; }
+        public DateTime RegistrationDate { get => registrationDate; set => registrationDate = value; }
+
+        public int Register()
+        {
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(PasswordHash);
+
+            DBservices db = new DBservices();
+
+            return db.InsertUserToDB(this);
+        }
+
+        public static User Login(string email, string password)
+        {
+            DBservices db = new DBservices();
+            User user = db.GetUserByEmail(email);
+
+            if (user == null) return null;
+            if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash)) return null;
+            if (user.IsLocked) throw new Exception("User is locked");
+
+            db.InsertUserLoginToDB(user.UserId);
+            return user;
+        }
+
+
     }
 }
