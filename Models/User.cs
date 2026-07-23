@@ -15,7 +15,6 @@ namespace CountriesProject.Models
         string imageUrl;
         bool isAdmin = false;
         bool isLocked = false;
-        DateTime registrationDate;
 
         List<string> hobbies = new List<string>();
         List<UserLanguage> spokenLanguages = new List<UserLanguage>();
@@ -44,7 +43,6 @@ namespace CountriesProject.Models
         public string ImageUrl { get => imageUrl; set => imageUrl = value; }
         public bool IsAdmin { get => isAdmin; set => isAdmin = value; }
         public bool IsLocked { get => isLocked; set => isLocked = value; }
-        public DateTime RegistrationDate { get => registrationDate; set => registrationDate = value; }
         public List<string> Hobbies { get => hobbies; set => hobbies = value; }
         public List<UserLanguage> SpokenLanguages { get => spokenLanguages; set => spokenLanguages = value; }
         public List<string> FavoriteRegions { get => favoriteRegions; set => favoriteRegions = value; }
