@@ -55,22 +55,57 @@ namespace CountriesProject.Models
         {
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(PasswordHash);
 
-            DBservices db = new DBservices();
+            DBservices dbs = new DBservices();
 
-            return db.InsertUserToDB(this);
+            return dbs.InsertUserToDB(this);
         }
 
         public static User Login(string email, string password)
         {
-            DBservices db = new DBservices();
-            User user = db.GetUserByEmail(email);
+            DBservices dbs = new DBservices();
+            User user = dbs.GetUserByEmail(email);
 
             if (user == null) return null;
             if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash)) return null;
             if (user.IsLocked) throw new Exception("User is locked");
 
-            db.InsertUserLoginToDB(user.UserId);
+            dbs.InsertUserLoginToDB(user.UserId);
             return user;
+        }
+
+        public static List<User> GetAllUsers()
+        {
+            DBservices dbs = new DBservices();
+            return dbs.GetAllUsersFromDB();
+        }
+
+        public static User GetUserById(int id)
+        {
+            DBservices dbs = new DBservices();
+            return dbs.GetUserByIdFromDB(id);
+        }
+
+        public int UpdateUser()
+        {
+            DBservices dbs = new DBservices();
+            return dbs.UpdateUserInDB(this);
+        }
+
+        public static int DeleteOrLockUser(int id)
+        {
+            DBservices dbs = new DBservices();
+            return dbs.DeleteOrLockUserInDB(id);
+        }
+
+        public static int UpdateLockStatus(int id, bool isLocked)
+        {
+            DBservices db = new DBservices();
+            return db.UpdateUserLockStatusInDB(id, isLocked);
+        }
+        public static void UpdateUserHobbies(int userId, List<string> hobbies)
+        {
+            DBservices db = new DBservices();
+            db.UpdateUserHobbiesInDB(userId, hobbies);
         }
 
 
