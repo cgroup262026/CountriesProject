@@ -18,6 +18,6 @@ namespace CountriesProject.Models
          List<string> currencies  = new List<string>();
          List<string> languages  = new List<string>();
          List<string> borders  = new List<string>(); 
-         List<Review> reviews  = new List<Review>();
+         //ביקורות ירדו, אין צורך שבכל יצירה או החזרה של מדינה האובייקט יכיל גם ביקורות. נבקש את הביקורות על מדינה באמצעות גט 
     }
 }
