@@ -31,6 +31,9 @@ namespace CountriesProject.DAL
             return con;
         }
 
+
+        //===============================================User===============================================//
+
         public int InsertUserToDB(User user)
         {
             SqlConnection con;
@@ -157,6 +160,266 @@ namespace CountriesProject.DAL
                 if (con != null) con.Close();
             }
         }
+
+        public List<User> GetAllUsersFromDB()
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+            List<User> users = new List<User>();
+
+            try
+            {
+                con = connect("myProjDB"); // create the connection
+            }
+            catch (Exception ex)
+            {
+                // write to log
+                throw (ex);
+            }
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_GET_ALL_USERS_P", con, null); // create the command
+
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+            try
+            {
+                while (dataReader.Read())
+                {
+                    User u = new User();
+                    u.UserId = Convert.ToInt32(dataReader["UserID"]);
+                    u.Email = dataReader["Email"].ToString();
+                    u.FullName = dataReader["FullName"].ToString();
+                    u.BirthDate = Convert.ToDateTime(dataReader["BirthDate"]);
+                    u.Gender = dataReader["Gender"].ToString();
+                    u.ImageUrl = dataReader["ImageUrl"] == DBNull.Value ? "" : dataReader["ImageUrl"].ToString();
+                    u.IsAdmin = Convert.ToBoolean(dataReader["IsAdmin"]);
+                    u.IsLocked = Convert.ToBoolean(dataReader["IsLocked"]);
+                    u.RegistrationDate = Convert.ToDateTime(dataReader["RegistrationDate"]);
+
+                    users.Add(u);
+                }
+                return users;
+            }
+            catch (Exception ex)
+            {
+                // write to log
+                throw (ex);
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    // close the db connection
+                    con.Close();
+                }
+            }
+        }
+
+        //--------------------------------------------------------------------------------------------------
+        // This method Reads a single user by ID 
+        //--------------------------------------------------------------------------------------------------
+        public User GetUserByIdFromDB(int id)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@UserID", id);
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_GET_USER_BY_ID_P", con, paramDic);
+
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+            try
+            {
+                if (dataReader.Read())
+                {
+                    User u = new User();
+                    u.UserId = Convert.ToInt32(dataReader["UserID"]);
+                    u.Email = dataReader["Email"].ToString();
+                    u.FullName = dataReader["FullName"].ToString();
+                    u.BirthDate = Convert.ToDateTime(dataReader["BirthDate"]);
+                    u.Gender = dataReader["Gender"].ToString();
+                    u.ImageUrl = dataReader["ImageUrl"] == DBNull.Value ? "" : dataReader["ImageUrl"].ToString();
+                    u.IsAdmin = Convert.ToBoolean(dataReader["IsAdmin"]);
+                    u.IsLocked = Convert.ToBoolean(dataReader["IsLocked"]);
+                    u.RegistrationDate = Convert.ToDateTime(dataReader["RegistrationDate"]);
+
+                    return u;
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (con != null)
+                    con.Close();
+            }
+        }
+
+        //--------------------------------------------------------------------------------------------------
+        // This method Updates a user in the database
+        //--------------------------------------------------------------------------------------------------
+        public int UpdateUserInDB(User user)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+
+            paramDic.Add("@UserID", user.UserId);
+            paramDic.Add("@FullName", user.FullName);
+            paramDic.Add("@BirthDate", user.BirthDate);
+            paramDic.Add("@Gender", user.Gender);
+            paramDic.Add("@ImageUrl", string.IsNullOrEmpty(user.ImageUrl) ? DBNull.Value : user.ImageUrl);
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_UPDATE_USER_P", con, paramDic);
+
+            try
+            {
+                int numEffected = cmd.ExecuteNonQuery();
+                return numEffected;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (con != null)
+                    con.Close();
+            }
+        }
+
+        //--------------------------------------------------------------------------------------------------
+        // This method Deletes (or Locks) a user in the database 
+        //--------------------------------------------------------------------------------------------------
+        public int DeleteOrLockUserInDB(int id)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("myProjDB"); // create the connection
+            }
+            catch (Exception ex)
+            {
+                // write to log
+                throw (ex);
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@UserID", id);
+
+            // קראתי לפרוצדורה SP_DELETE_USER_P - במסד הנתונים תוכל להחליט אם היא מוחקת או רק מעדכנת סטטוס נעילה
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_DELETE_USER_P", con, paramDic); // create the command
+
+            try
+            {
+                int numEffected = cmd.ExecuteNonQuery(); // execute the command
+                return numEffected;
+            }
+            catch (Exception ex)
+            {
+                // write to log
+                throw (ex);
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    // close the db connection
+                    con.Close();
+                }
+            }
+        }
+
+        public int UpdateUserLockStatusInDB(int id, bool isLocked)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try { con = connect("myProjDB"); }
+            catch (Exception ex) { throw ex; }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@UserID", id);
+            paramDic.Add("@IsLocked", isLocked);
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_UPDATE_USER_LOCK_STATUS_P", con, paramDic);
+
+            try
+            {
+                return cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex) { throw ex; }
+            finally { if (con != null) con.Close(); }
+        }
+
+        public int UpdateUserHobbiesInDB(int userID, List<string> hobbies)
+        {
+            SqlConnection con = null;
+            int numEffected = 0;
+
+            try
+            {
+                con = connect("myProjDB");
+
+                Dictionary<string, object> clearParamDic = new Dictionary<string, object>();
+                clearParamDic.Add("@UserID", userID);
+
+                SqlCommand clearCmd = CreateCommandWithStoredProcedureGeneral("SP_CLEAR_USER_HOBBIES_P", con, clearParamDic);
+                clearCmd.ExecuteNonQuery();
+
+                foreach (string hobby in hobbies)
+                {
+                    Dictionary<string, object> paramDic = new Dictionary<string, object>();
+                    paramDic.Add("@UserID", userID);
+                    paramDic.Add("@HobbyName", hobby);
+
+                    SqlCommand cmd = CreateCommandWithStoredProcedureGeneral("SP_ADD_USER_HOBBY_P", con, paramDic);
+                    numEffected += cmd.ExecuteNonQuery();
+                }
+
+                return numEffected;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (con != null) con.Close();
+            }
+        }
+
+        //===============================================COUNTRY===============================================//
+
+
+
 
         //---------------------------------------------------------------------------------
         // Create the SqlCommand
