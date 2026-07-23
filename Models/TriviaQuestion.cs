@@ -2,12 +2,12 @@
 {
     public class TriviaQuestion
     {
-        private int questionId;
-        private string questionText;
-        private string correctAnswer;
-        private string wrongAnswer1;
-        private string wrongAnswer2;
-        private string wrongAnswer3;
+        int questionId;
+        string questionText;
+        string correctAnswer;
+        string wrongAnswer1;
+        string wrongAnswer2;
+        string wrongAnswer3;
 
         public TriviaQuestion(int questionId, string questionText, string correctAnswer, string wrongAnswer1, string wrongAnswer2, string wrongAnswer3)
         {
