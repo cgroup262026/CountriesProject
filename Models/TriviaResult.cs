@@ -1,4 +1,6 @@
-﻿namespace CountriesProject.Models
+﻿using CountriesProject.DAL;
+
+namespace CountriesProject.Models
 {
     public class TriviaResult
     {
@@ -26,5 +28,11 @@
         public int? CorrectAnswers { get => correctAnswers; set => correctAnswers = value; }
         public int? TotalQuestions { get => totalQuestions; set => totalQuestions = value; }
         public DateTime PlayDate { get => playDate; set => playDate = value; }
+
+        public int Insert()
+        {
+            DBservices dbs = new DBservices();
+            return dbs.InsertTriviaResultToDB(this);
+        }
     }
 }
