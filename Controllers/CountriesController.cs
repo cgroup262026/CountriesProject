@@ -10,6 +10,13 @@ namespace CountriesProject.Controllers
     [ApiController]
     public class CountriesController : ControllerBase
     {
+        [HttpPost("import")]
+        public async Task<IActionResult> ImportCountries()
+        {
+            int count = await Country.ImportAllCountries();
+            return Ok(new { ImportedCountries = count });
+        }
+
         // GET: api/<CountriesController>
         [HttpGet]
         public IEnumerable<string> Get()
@@ -42,6 +49,12 @@ namespace CountriesProject.Controllers
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+        }
+
+        [HttpGet("memory-game")]
+        public List<Country> GetMemoryGameCountries()
+        {
+            return Country.GetMemoryGameCountries();
         }
     }
 }

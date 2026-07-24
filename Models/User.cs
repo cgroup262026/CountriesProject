@@ -79,10 +79,20 @@ namespace CountriesProject.Models
             return dbs.GetAllUsersFromDB();
         }
 
-        public static User GetUserById(int id)
+        public static User GetUserById(int userId)
         {
             DBservices dbs = new DBservices();
-            return dbs.GetUserByIdFromDB(id);
+            User user = dbs.GetUserByIdFromDB(userId);
+
+            if (user != null)
+            {
+                user.Hobbies = dbs.GetUserHobbiesFromDB(userId);
+                user.SpokenLanguages = dbs.GetUserLanguagesFromDB(userId);
+                user.FavoriteRegions = dbs.GetUserRegionsFromDB(userId);
+                user.TravelPreferences = dbs.GetUserTravelPreferencesFromDB(userId);
+            }
+
+            return user;
         }
 
         public int UpdateUser()
@@ -102,12 +112,47 @@ namespace CountriesProject.Models
             DBservices db = new DBservices();
             return db.UpdateUserLockStatusInDB(id, isLocked);
         }
+
+        public static List<string> GetAllHobbies()
+        {
+            DBservices dbs = new DBservices();
+            return dbs.GetAllHobbiesFromDB();
+        }
+
+        public static List<string> GetUserHobbies(int userId)
+        {
+            DBservices dbs = new DBservices();
+            return dbs.GetUserHobbiesFromDB(userId);
+        }
+
         public static void UpdateUserHobbies(int userId, List<string> hobbies)
         {
             DBservices db = new DBservices();
             db.UpdateUserHobbiesInDB(userId, hobbies);
         }
 
+        public static int GetUserTotalScore(int userId)
+        {
+            DBservices dbs = new DBservices();
+            return dbs.GetUserTotalScoreFromDB(userId);
+        }
 
+        public static int AddSavedCountry(int userId, string alpha3Code, string listType)
+        {
+            DBservices dbs = new DBservices();
+            return dbs.AddUserSavedCountryToDB(userId, alpha3Code, listType);
+        }
+
+        public static int DeleteSavedCountry(int userId, string alpha3Code)
+        {
+            DBservices dbs = new DBservices();
+            return dbs.DeleteUserSavedCountryFromDB(userId, alpha3Code);
+        }
+
+        public static List<Country> GetSavedCountries(int userId, string listType)
+        {
+            DBservices dbs = new DBservices();
+            return dbs.GetUserSavedCountriesFromDB(userId, listType);
+        }
     }
 }

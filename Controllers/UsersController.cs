@@ -9,7 +9,6 @@ namespace CountriesProject.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        // 1. קבלת כל המשתמשים (לשימוש המנהל)
         // GET: api/<UsersController>
         [HttpGet]
         public IActionResult GetAll()
@@ -18,22 +17,13 @@ namespace CountriesProject.Controllers
             return Ok(users);
         }
 
-        // 2. קבלת משתמש ספציפי לפי מזהה (לתצוגת הפרופיל שלו)
         // GET api/<UsersController>/5
-        [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        [HttpGet("{userId}")]
+        public User Get(int userId)
         {
-            User user = CountriesProject.Models.User.GetUserById(id);
-
-            if (user == null)
-            {
-                return NotFound("User not found.");
-            }
-
-            return Ok(user);
+            return CountriesProject.Models.User.GetUserById(userId);
         }
 
-        // 3. הרשמה (יצירת משתמש חדש)
         // POST api/<UsersController>/register
         [HttpPost("register")]
         public IActionResult Register([FromBody] User user)
@@ -48,7 +38,6 @@ namespace CountriesProject.Controllers
             return BadRequest("Registration failed.");
         }
 
-        // 4. התחברות
         // POST api/<UsersController>/login
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginRequest login)
@@ -63,12 +52,11 @@ namespace CountriesProject.Controllers
             return Ok(user);
         }
 
-        // 5. עדכון פרטי משתמש בסיסיים (שם, תאריך לידה, מגדר, תמונה)
-        // PUT api/<UsersController>/5
+        // PUT api/<UsersController>/
         [HttpPut("{id}")]
         public IActionResult Put(int id, [FromBody] User updatedUser)
         {
-            updatedUser.UserId = id; // מוודאים שהמזהה בפנייה תואם לאובייקט
+            updatedUser.UserId = id;
 
             int affectedRows = updatedUser.UpdateUser();
 
@@ -80,8 +68,7 @@ namespace CountriesProject.Controllers
             return BadRequest("Update failed.");
         }
 
-        // 6. עדכון סטטוס נעילה של משתמש (לשימוש המנהל)
-        // PUT api/<UsersController>/lock/5
+        // PUT api/<UsersController>/lock/
         [HttpPut("lock/{id}")]
         public IActionResult UpdateLockStatus(int id, [FromBody] bool isLocked)
         {
@@ -95,8 +82,13 @@ namespace CountriesProject.Controllers
             return BadRequest("Failed to update lock status.");
         }
 
-        // 7. עדכון רשימת התחביבים של המשתמש (מחיקה והוספה מחדש בפרוצדורה אחת)
-        // PUT api/<UsersController>/5/hobbies
+        [HttpGet("hobbies")]
+        public List<string> GetAllHobbies()
+        {
+            return CountriesProject.Models.User.GetAllHobbies();
+        }
+
+        // PUT api/<UsersController>/
         [HttpPut("{id}/hobbies")]
         public IActionResult UpdateHobbies(int id, [FromBody] List<string> hobbies)
         {
@@ -111,8 +103,13 @@ namespace CountriesProject.Controllers
             }
         }
 
-        // 8. מחיקת משתמש פיזית ממסד הנתונים
-        // DELETE api/<UsersController>/5
+        [HttpGet("{userId}/hobbies")]
+        public List<string> GetUserHobbies(int userId)
+        {
+            return CountriesProject.Models.User.GetUserHobbies(userId);
+        }
+
+        // DELETE api/<UsersController>/
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
@@ -124,6 +121,30 @@ namespace CountriesProject.Controllers
             }
 
             return BadRequest("Failed to delete user.");
+        }
+
+        [HttpGet("{userId}/total-score")]
+        public int GetUserTotalScore(int userId)
+        {
+            return CountriesProject.Models.User.GetUserTotalScore(userId);
+        }
+
+        [HttpPost("{userId}/saved-countries/{alpha3Code}/{listType}")]
+        public int AddSavedCountry(int userId, string alpha3Code, string listType)
+        {
+            return CountriesProject.Models.User.AddSavedCountry(userId, alpha3Code, listType);
+        }
+
+        [HttpDelete("{userId}/saved-countries/{alpha3Code}")]
+        public int DeleteSavedCountry(int userId, string alpha3Code)
+        {
+            return CountriesProject.Models.User.DeleteSavedCountry(userId, alpha3Code);
+        }
+
+        [HttpGet("{userId}/saved-countries/{listType}")]
+        public List<Country> GetSavedCountries(int userId, string listType)
+        {
+            return CountriesProject.Models.User.GetSavedCountries(userId, listType);
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace CountriesProject.Models
+﻿using CountriesProject.DAL;
+
+namespace CountriesProject.Models
 {
     public class MemoryGameResult
     {
@@ -29,5 +31,11 @@
         public int? MatchedPairs { get => matchedPairs; set => matchedPairs = value; }
         public bool? IsCompleted { get => isCompleted; set => isCompleted = value; }
         public DateTime PlayDate { get => playDate; set => playDate = value; }
+
+        public int Insert()
+        {
+            DBservices dbs = new DBservices();
+            return dbs.InsertMemoryGameResultToDB(this);
+        }
     }
 }
