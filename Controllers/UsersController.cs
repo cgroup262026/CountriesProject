@@ -9,14 +9,6 @@ namespace CountriesProject.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        // GET: api/<UsersController>
-        [HttpGet]
-        public IActionResult GetAll()
-        {
-            List<User> users = CountriesProject.Models.User.GetAllUsers();
-            return Ok(users);
-        }
-
         // GET api/<UsersController>/5
         [HttpGet("{userId}")]
         public User Get(int userId)
@@ -68,20 +60,6 @@ namespace CountriesProject.Controllers
             return BadRequest("Update failed.");
         }
 
-        // PUT api/<UsersController>/lock/
-        [HttpPut("lock/{id}")]
-        public IActionResult UpdateLockStatus(int id, [FromBody] bool isLocked)
-        {
-            int affectedRows = CountriesProject.Models.User.UpdateLockStatus(id, isLocked);
-
-            if (affectedRows > 0)
-            {
-                return Ok(new { Message = "User lock status updated successfully." });
-            }
-
-            return BadRequest("Failed to update lock status.");
-        }
-
         [HttpGet("hobbies")]
         public List<string> GetAllHobbies()
         {
@@ -107,20 +85,6 @@ namespace CountriesProject.Controllers
         public List<string> GetUserHobbies(int userId)
         {
             return CountriesProject.Models.User.GetUserHobbies(userId);
-        }
-
-        // DELETE api/<UsersController>/
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
-        {
-            int affectedRows = CountriesProject.Models.User.DeleteOrLockUser(id);
-
-            if (affectedRows > 0)
-            {
-                return Ok("User deleted successfully.");
-            }
-
-            return BadRequest("Failed to delete user.");
         }
 
         [HttpGet("{userId}/total-score")]

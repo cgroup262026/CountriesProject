@@ -161,60 +161,6 @@ namespace CountriesProject.DAL
             }
         }
 
-        public List<User> GetAllUsersFromDB()
-        {
-            SqlConnection con;
-            SqlCommand cmd;
-            List<User> users = new List<User>();
-
-            try
-            {
-                con = connect("myProjDB"); // create the connection
-            }
-            catch (Exception ex)
-            {
-                // write to log
-                throw (ex);
-            }
-
-            cmd = CreateCommandWithStoredProcedureGeneral("SP_GET_ALL_USERS_P", con, null); // create the command
-
-            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
-
-            try
-            {
-                while (dataReader.Read())
-                {
-                    User u = new User();
-                    u.UserId = Convert.ToInt32(dataReader["UserID"]);
-                    u.Email = dataReader["Email"].ToString();
-                    u.FullName = dataReader["FullName"].ToString();
-                    u.BirthDate = Convert.ToDateTime(dataReader["BirthDate"]);
-                    u.Gender = dataReader["Gender"].ToString();
-                    u.ImageUrl = dataReader["ImageUrl"] == DBNull.Value ? "" : dataReader["ImageUrl"].ToString();
-                    u.IsAdmin = Convert.ToBoolean(dataReader["IsAdmin"]);
-                    u.IsLocked = Convert.ToBoolean(dataReader["IsLocked"]);
-                    u.RegistrationDate = Convert.ToDateTime(dataReader["RegistrationDate"]);
-
-                    users.Add(u);
-                }
-                return users;
-            }
-            catch (Exception ex)
-            {
-                // write to log
-                throw (ex);
-            }
-            finally
-            {
-                if (con != null)
-                {
-                    // close the db connection
-                    con.Close();
-                }
-            }
-        }
-
         //--------------------------------------------------------------------------------------------------
         // This method Reads a single user by ID 
         //--------------------------------------------------------------------------------------------------
@@ -310,89 +256,6 @@ namespace CountriesProject.DAL
             {
                 if (con != null)
                     con.Close();
-            }
-        }
-
-        //--------------------------------------------------------------------------------------------------
-        // This method Deletes (or Locks) a user in the database 
-        //--------------------------------------------------------------------------------------------------
-        public int DeleteOrLockUserInDB(int id)
-        {
-            SqlConnection con;
-            SqlCommand cmd;
-
-            try
-            {
-                con = connect("myProjDB"); // create the connection
-            }
-            catch (Exception ex)
-            {
-                // write to log
-                throw (ex);
-            }
-
-            Dictionary<string, object> paramDic = new Dictionary<string, object>();
-            paramDic.Add("@UserID", id);
-
-            cmd = CreateCommandWithStoredProcedureGeneral("SP_DELETE_USER_P", con, paramDic); // create the command
-
-            try
-            {
-                int numEffected = cmd.ExecuteNonQuery(); // execute the command
-                return numEffected;
-            }
-            catch (Exception ex)
-            {
-                // write to log
-                throw (ex);
-            }
-            finally
-            {
-                if (con != null)
-                {
-                    // close the db connection
-                    con.Close();
-                }
-            }
-        }
-
-        public int UpdateUserLockStatusInDB(int id, bool isLocked)
-        {
-            SqlConnection con;
-            SqlCommand cmd;
-
-            try
-            {
-                con = connect("myProjDB");
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-
-            Dictionary<string, object> paramDic = new Dictionary<string, object>();
-            paramDic.Add("@UserID", id);
-            paramDic.Add("@IsLocked", isLocked);
-
-            cmd = CreateCommandWithStoredProcedureGeneral("SP_UPDATE_USER_LOCK_STATUS_P", con, paramDic);
-
-            try
-            {
-                int numEffected = cmd.ExecuteNonQuery();
-                return numEffected;
-            }
-            catch (Exception ex)
-            {
-                // write to log
-                throw (ex);
-            }
-            finally
-            {
-                if (con != null)
-                {
-                    // close the db connection
-                    con.Close();
-                }
             }
         }
 
@@ -938,6 +801,239 @@ namespace CountriesProject.DAL
             }
         }
 
+        public List<Country> GetAllCountriesFromDB()
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+            List<Country> countries = new List<Country>();
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_GET_ALL_COUNTRIES_P", con, null);
+
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+            try
+            {
+                while (dataReader.Read())
+                {
+                    Country country = new Country();
+                    country.Alpha3Code = dataReader["Alpha3Code"].ToString();
+                    country.Alpha2Code = dataReader["Alpha2Code"].ToString();
+                    country.Name = dataReader["CountryName"].ToString();
+                    country.Capital = dataReader["Capital"] == DBNull.Value ? "" : dataReader["Capital"].ToString();
+                    country.Region = dataReader["RegionName"].ToString();
+                    country.SubRegion = dataReader["Subregion"] == DBNull.Value ? "" : dataReader["Subregion"].ToString();
+                    country.Population = Convert.ToInt64(dataReader["Population"]);
+                    country.Area = Convert.ToDouble(dataReader["Area"]);
+                    country.FlagUrl = dataReader["FlagUrl"] == DBNull.Value ? "" : dataReader["FlagUrl"].ToString();
+                    countries.Add(country);
+                }
+                return countries;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
+        }
+
+        public Country GetCountryByCodeFromDB(string alpha3Code)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@Alpha3Code", alpha3Code);
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_GET_COUNTRY_BY_CODE_P", con, paramDic);
+
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+            try
+            {
+                if (dataReader.Read())
+                {
+                    Country country = new Country();
+                    country.Alpha3Code = dataReader["Alpha3Code"].ToString();
+                    country.Alpha2Code = dataReader["Alpha2Code"].ToString();
+                    country.Name = dataReader["CountryName"].ToString();
+                    country.Capital = dataReader["Capital"] == DBNull.Value ? "" : dataReader["Capital"].ToString();
+                    country.Region = dataReader["RegionName"].ToString();
+                    country.SubRegion = dataReader["Subregion"] == DBNull.Value ? "" : dataReader["Subregion"].ToString();
+                    country.Population = Convert.ToInt64(dataReader["Population"]);
+                    country.Area = Convert.ToDouble(dataReader["Area"]);
+                    country.FlagUrl = dataReader["FlagUrl"] == DBNull.Value ? "" : dataReader["FlagUrl"].ToString();
+                    return country;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
+        }
+
+        public List<string> GetCountryCurrenciesFromDB(string alpha3Code)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+            List<string> currencies = new List<string>();
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@Alpha3Code", alpha3Code);
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_GET_COUNTRY_CURRENCIES_P", con, paramDic);
+
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+            try
+            {
+                while (dataReader.Read())
+                {
+                    currencies.Add(dataReader["CurrencyName"].ToString());
+                }
+                return currencies;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
+        }
+
+        public List<string> GetCountryLanguagesFromDB(string alpha3Code)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+            List<string> languages = new List<string>();
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@Alpha3Code", alpha3Code);
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_GET_COUNTRY_LANGUAGES_P", con, paramDic);
+
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+            try
+            {
+                while (dataReader.Read())
+                {
+                    languages.Add(dataReader["LanguageName"].ToString());
+                }
+                return languages;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
+        }
+
+        public List<string> GetCountryBordersFromDB(string alpha3Code)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+            List<string> borders = new List<string>();
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@Alpha3Code", alpha3Code);
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_GET_COUNTRY_BORDERS_P", con, paramDic);
+
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+            try
+            {
+                while (dataReader.Read())
+                {
+                    borders.Add(dataReader["BorderAlpha3Code"].ToString());
+                }
+                return borders;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
+        }
+
+
+
         //===============================================HOBBIES===============================================//
 
         public List<string> GetAllHobbiesFromDB()
@@ -1281,6 +1377,187 @@ namespace CountriesProject.DAL
                 }
             }
         }
+
+        //===============================================ADMIN===============================================//
+
+        public List<User> GetAllUsersFromDB()
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+            List<User> users = new List<User>();
+
+            try
+            {
+                con = connect("myProjDB"); // create the connection
+            }
+            catch (Exception ex)
+            {
+                // write to log
+                throw (ex);
+            }
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_GET_ALL_USERS_P", con, null); // create the command
+
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+            try
+            {
+                while (dataReader.Read())
+                {
+                    User u = new User();
+                    u.UserId = Convert.ToInt32(dataReader["UserID"]);
+                    u.Email = dataReader["Email"].ToString();
+                    u.FullName = dataReader["FullName"].ToString();
+                    u.BirthDate = Convert.ToDateTime(dataReader["BirthDate"]);
+                    u.Gender = dataReader["Gender"].ToString();
+                    u.ImageUrl = dataReader["ImageUrl"] == DBNull.Value ? "" : dataReader["ImageUrl"].ToString();
+                    u.IsAdmin = Convert.ToBoolean(dataReader["IsAdmin"]);
+                    u.IsLocked = Convert.ToBoolean(dataReader["IsLocked"]);
+                    u.RegistrationDate = Convert.ToDateTime(dataReader["RegistrationDate"]);
+
+                    users.Add(u);
+                }
+                return users;
+            }
+            catch (Exception ex)
+            {
+                // write to log
+                throw (ex);
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    // close the db connection
+                    con.Close();
+                }
+            }
+        }
+
+        //--------------------------------------------------------------------------------------------------
+        // This method Deletes (or Locks) a user in the database 
+        //--------------------------------------------------------------------------------------------------
+        public int DeleteOrLockUserInDB(int id)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("myProjDB"); // create the connection
+            }
+            catch (Exception ex)
+            {
+                // write to log
+                throw (ex);
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@UserID", id);
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_DELETE_USER_P", con, paramDic); // create the command
+
+            try
+            {
+                int numEffected = cmd.ExecuteNonQuery(); // execute the command
+                return numEffected;
+            }
+            catch (Exception ex)
+            {
+                // write to log
+                throw (ex);
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    // close the db connection
+                    con.Close();
+                }
+            }
+        }
+
+        public int UpdateUserLockStatusInDB(int id, bool isLocked)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@UserID", id);
+            paramDic.Add("@IsLocked", isLocked);
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_UPDATE_USER_LOCK_STATUS_P", con, paramDic);
+
+            try
+            {
+                int numEffected = cmd.ExecuteNonQuery();
+                return numEffected;
+            }
+            catch (Exception ex)
+            {
+                // write to log
+                throw (ex);
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    // close the db connection
+                    con.Close();
+                }
+            }
+        }
+
+        public AdminStatistics GetAdminStatisticsFromDB()
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_GET_ADMIN_STATISTICS_P", con, null);
+
+            try
+            {
+                SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+                if (dataReader.Read())
+                {
+                    AdminStatistics ads = new AdminStatistics();
+                    ads.DailyLogins = Convert.ToInt32(dataReader["DailyLogins"]);
+                    ads.TotalCountries = Convert.ToInt32(dataReader["TotalCountries"]);
+                    ads.SavedCountries = Convert.ToInt32(dataReader["SavedCountries"]);
+                    ads.TotalReviews = Convert.ToInt32(dataReader["TotalReviews"]);
+                    return ads;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+
+
+
+
 
         //---------------------------------------------------------------------------------
         // Create the SqlCommand

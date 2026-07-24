@@ -6,13 +6,13 @@ namespace CountriesProject.Models
     {
         int resultId;
         int userID;
-        int? score;
-        int? correctAnswers;
-        int? totalQuestions;
+        int score;
+        int correctAnswers;
+        int totalQuestions;
         DateTime playDate;
 
         public TriviaResult() { }
-        public TriviaResult(int resultId, int userID, int? score, int? correctAnswers, int? totalQuestions, DateTime playDate)
+        public TriviaResult(int resultId, int userID, int score, int correctAnswers, int totalQuestions, DateTime playDate)
         {
             ResultId = resultId;
             UserID = userID;
@@ -24,9 +24,9 @@ namespace CountriesProject.Models
 
         public int ResultId { get => resultId; set => resultId = value; }
         public int UserID { get => userID; set => userID = value; }
-        public int? Score { get => score; set => score = value; }
-        public int? CorrectAnswers { get => correctAnswers; set => correctAnswers = value; }
-        public int? TotalQuestions { get => totalQuestions; set => totalQuestions = value; }
+        public int Score { get => score; set => score = value; }
+        public int CorrectAnswers { get => correctAnswers; set => correctAnswers = value; }
+        public int TotalQuestions { get => totalQuestions; set => totalQuestions = value; }
         public DateTime PlayDate { get => playDate; set => playDate = value; }
 
         public int Insert()

@@ -17,26 +17,31 @@ namespace CountriesProject.Controllers
             return Ok(new { ImportedCountries = count });
         }
 
-        // GET: api/<CountriesController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IActionResult GetAllCountries()
         {
-            return new string[] { "value1", "value2" };
+            List<Country> countries = Country.GetAllCountries();
+            return Ok(countries);
         }
 
-        // GET api/<CountriesController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpGet("{alpha3Code}")]
+        public IActionResult GetCountryByCode(string alpha3Code)
         {
-            return "value";
+            Country country = Country.GetCountryByCode(alpha3Code);
+
+            if (country == null) return NotFound("Country not found.");
+            return Ok(country);
         }
 
         //POST api/<CountriesController>
         [HttpPost]
         [Route("api/countries/add")]
-        public void Post([FromBody] Country country)
+        public IActionResult AddCountry([FromBody] Country country)
         {
+            int affectedRows = country.Insert();
 
+            if (affectedRows > 0) return Ok(country);
+            return BadRequest("Failed to add country.");
         }
 
         // PUT api/<CountriesController>/5

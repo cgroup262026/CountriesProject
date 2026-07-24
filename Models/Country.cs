@@ -122,10 +122,63 @@ namespace CountriesProject.Models
             return countries.Count;
         }
 
+        public static List<Country> GetAllCountries()
+        {
+            DBservices dbs = new DBservices();
+            return dbs.GetAllCountriesFromDB();
+        }
+
+        public static Country GetCountryByCode(string alpha3Code)
+        {
+            DBservices dbs = new DBservices();
+
+            Country country = dbs.GetCountryByCodeFromDB(alpha3Code);
+
+            if (country != null)
+            {
+                country.Currencies = dbs.GetCountryCurrenciesFromDB(alpha3Code);
+                country.Languages = dbs.GetCountryLanguagesFromDB(alpha3Code);
+                country.Borders = dbs.GetCountryBordersFromDB(alpha3Code);
+            }
+
+            return country;
+        }
+
+        public int Insert()
+        {
+            DBservices dbs = new DBservices();
+
+            int affectedRows = dbs.InsertCountryToDB(this);
+
+            if (affectedRows > 0)
+            {
+                foreach (string currency in Currencies)
+                {
+                    dbs.InsertCurrencyToDB(currency);
+                    dbs.InsertCountryCurrencyToDB(Alpha3Code, currency);
+                }
+
+                foreach (string language in Languages)
+                {
+                    dbs.InsertLanguageToDB(language);
+                    dbs.InsertCountryLanguageToDB(Alpha3Code, language);
+                }
+
+                foreach (string border in Borders)
+                {
+                    dbs.InsertCountryBorderToDB(Alpha3Code, border);
+                }
+            }
+
+            return affectedRows;
+        }
+
         public static List<Country> GetMemoryGameCountries()
         {
             DBservices dbs = new DBservices();
             return dbs.GetMemoryGameCountriesFromDB();
         }
+
+        
     }
 }
