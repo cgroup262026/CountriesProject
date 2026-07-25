@@ -110,5 +110,40 @@ namespace CountriesProject.Controllers
         {
             return CountriesProject.Models.User.GetSavedCountries(userId, listType);
         }
+
+        [HttpPut("{userId}/languages")]
+        public IActionResult UpdateUserLanguages(int userId, [FromBody] List<UserLanguage> languages)
+        {
+            UserLanguage.UpdateUserLanguages(userId, languages);
+            return Ok("User languages updated successfully.");
+        }
+
+        [HttpGet("regions")]
+        public IActionResult GetAllRegions()
+        {
+            List<string> regions = CountriesProject.Models.User.GetAllRegions();
+            return Ok(regions);
+        }
+
+        [HttpPut("{userId}/regions")]
+        public IActionResult UpdateUserRegions(int userId, [FromBody] List<string> regions)
+        {
+            CountriesProject.Models.User.UpdateUserRegions(userId, regions);
+            return Ok("User regions updated successfully.");
+        }
+
+        [HttpGet("travel-preferences")]
+        public IActionResult GetAllTravelPreferences()
+        {
+            List<string> preferences = CountriesProject.Models.User.GetAllTravelPreferences();
+            return Ok(preferences);
+        }
+
+        [HttpPut("{userId}/travel-preferences")]
+        public IActionResult UpdateUserTravelPreferences(int userId, [FromBody] List<string> preferences)
+        {
+            CountriesProject.Models.User.UpdateUserTravelPreferences(userId, preferences);
+            return Ok("User travel preferences updated successfully.");
+        }
     }
 }

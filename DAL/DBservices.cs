@@ -107,7 +107,10 @@ namespace CountriesProject.DAL
             }
             finally
             {
-                if (con != null) con.Close();
+                if (con != null)
+                {
+                    con.Close();
+                }
             }
         }
 
@@ -165,9 +168,6 @@ namespace CountriesProject.DAL
             }
         }
 
-        //--------------------------------------------------------------------------------------------------
-        // This method Reads a single user by ID 
-        //--------------------------------------------------------------------------------------------------
         public User GetUserByIdFromDB(int id)
         {
             SqlConnection con;
@@ -223,9 +223,6 @@ namespace CountriesProject.DAL
             }
         }
 
-        //--------------------------------------------------------------------------------------------------
-        // This method Updates a user in the database
-        //--------------------------------------------------------------------------------------------------
         public int UpdateUserInDB(User user)
         {
             SqlConnection con;
@@ -262,7 +259,10 @@ namespace CountriesProject.DAL
             finally
             {
                 if (con != null)
+                {
                     con.Close();
+                }
+                   
             }
         }
 
@@ -868,6 +868,186 @@ namespace CountriesProject.DAL
             }
         }
 
+        public int UpdateCountryInDB(Country country)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@Alpha3Code", country.Alpha3Code);
+            paramDic.Add("@Alpha2Code", country.Alpha2Code);
+            paramDic.Add("@CountryName", country.Name);
+            paramDic.Add("@Capital", string.IsNullOrEmpty(country.Capital) ? DBNull.Value : country.Capital);
+            paramDic.Add("@RegionName", country.Region);
+            paramDic.Add("@Subregion", string.IsNullOrEmpty(country.SubRegion) ? DBNull.Value : country.SubRegion);
+            paramDic.Add("@Population", country.Population);
+            paramDic.Add("@Area", country.Area);
+            paramDic.Add("@FlagUrl", string.IsNullOrEmpty(country.FlagUrl) ? DBNull.Value : country.FlagUrl);
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_UPDATE_COUNTRY_P", con, paramDic);
+
+            try
+            {
+                int numEffected = cmd.ExecuteNonQuery();
+                return numEffected;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
+        }
+
+        public int ClearCountryDetailsFromDB(string alpha3Code)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@Alpha3Code", alpha3Code);
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_CLEAR_COUNTRY_DETAILS_P", con, paramDic);
+
+            try
+            {
+                int numEffected = cmd.ExecuteNonQuery();
+                return numEffected;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
+        }
+
+        public int DeleteCountryFromDB(string alpha3Code)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@Alpha3Code", alpha3Code);
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_DELETE_COUNTRY_P", con, paramDic);
+
+            try
+            {
+                int numEffected = cmd.ExecuteNonQuery();
+                return numEffected;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
+        }
+
+        public List<Country> SearchCountriesFromDB(string name, string region, string language, string currency, long? minPopulation, long? maxPopulation, double? minArea, double? maxArea, string sortBy, string sortDirection)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+            List<Country> countries = new List<Country>();
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@Name", string.IsNullOrWhiteSpace(name) ? DBNull.Value : name);
+            paramDic.Add("@RegionName", string.IsNullOrWhiteSpace(region) ? DBNull.Value : region);
+            paramDic.Add("@LanguageName", string.IsNullOrWhiteSpace(language) ? DBNull.Value : language);
+            paramDic.Add("@CurrencyName", string.IsNullOrWhiteSpace(currency) ? DBNull.Value : currency);
+            paramDic.Add("@MinPopulation", minPopulation.HasValue ? (object)minPopulation.Value : DBNull.Value);
+            paramDic.Add("@MaxPopulation", maxPopulation.HasValue ? (object)maxPopulation.Value : DBNull.Value);
+            paramDic.Add("@MinArea", minArea.HasValue ? (object)minArea.Value : DBNull.Value);
+            paramDic.Add("@MaxArea", maxArea.HasValue ? (object)maxArea.Value : DBNull.Value);
+            paramDic.Add("@SortBy", string.IsNullOrWhiteSpace(sortBy) ? "name" : sortBy);
+            paramDic.Add("@SortDirection", string.IsNullOrWhiteSpace(sortDirection) ? "asc" : sortDirection);
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_SEARCH_COUNTRIES_P", con, paramDic);
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+            try
+            {
+                while (dataReader.Read())
+                {
+                    Country country = new Country();
+                    country.Alpha3Code = dataReader["Alpha3Code"].ToString();
+                    country.Alpha2Code = dataReader["Alpha2Code"].ToString();
+                    country.Name = dataReader["CountryName"].ToString();
+                    country.Capital = dataReader["Capital"] == DBNull.Value ? "" : dataReader["Capital"].ToString();
+                    country.Region = dataReader["RegionName"].ToString();
+                    country.SubRegion = dataReader["Subregion"] == DBNull.Value ? "" : dataReader["Subregion"].ToString();
+                    country.Population = Convert.ToInt64(dataReader["Population"]);
+                    country.Area = Convert.ToDouble(dataReader["Area"]);
+                    country.FlagUrl = dataReader["FlagUrl"] == DBNull.Value ? "" : dataReader["FlagUrl"].ToString();
+                    countries.Add(country);
+                }
+                return countries;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
+        }
+
         public Country GetCountryByCodeFromDB(string alpha3Code)
         {
             SqlConnection con;
@@ -1050,7 +1230,6 @@ namespace CountriesProject.DAL
         }
 
 
-
         //===============================================HOBBIES===============================================//
 
         public List<string> GetAllHobbiesFromDB()
@@ -1226,6 +1405,13 @@ namespace CountriesProject.DAL
             catch (Exception ex)
             {
                 throw ex;
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
             }
         }
 
@@ -1457,9 +1643,6 @@ namespace CountriesProject.DAL
             }
         }
 
-        //--------------------------------------------------------------------------------------------------
-        // This method Deletes (or Locks) a user in the database 
-        //--------------------------------------------------------------------------------------------------
         public int DeleteOrLockUserInDB(int id)
         {
             SqlConnection con;
@@ -1575,11 +1758,354 @@ namespace CountriesProject.DAL
             {
                 throw ex;
             }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
         }
 
+        //===============================================LANGUAGE===============================================//
 
+        public List<string> GetAllLanguagesFromDB()
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+            List<string> languages = new List<string>();
 
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
 
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_GET_ALL_LANGUAGES_P", con, paramDic);
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+            try
+            {
+                while (dataReader.Read())
+                {
+                    languages.Add(dataReader["LanguageName"].ToString());
+                }
+                return languages;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
+        }
+
+        public int ClearUserLanguagesFromDB(int userId)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@UserID", userId);
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_CLEAR_USER_LANGUAGES_P", con, paramDic);
+
+            try
+            {
+                return cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
+        }
+
+        public int AddUserLanguageToDB(int userId, UserLanguage language)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@UserID", userId);
+            paramDic.Add("@LanguageName", language.LanguageName);
+            paramDic.Add("@ProficiencyLevel", language.ProficiencyLevel);
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_ADD_USER_LANGUAGE_P", con, paramDic);
+
+            try
+            {
+                return cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
+        }
+
+        //===============================================REGION===============================================//
+
+        public List<string> GetAllRegionsFromDB()
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+            List<string> regions = new List<string>();
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_GET_ALL_REGIONS_P", con, paramDic);
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+            try
+            {
+                while (dataReader.Read())
+                {
+                    regions.Add(dataReader["RegionName"].ToString());
+                }
+                return regions;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
+        }
+
+        public int ClearUserRegionsFromDB(int userId)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@UserID", userId);
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_CLEAR_USER_REGIONS_P", con, paramDic);
+
+            try
+            {
+                return cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
+        }
+
+        public int AddUserRegionToDB(int userId, string regionName)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@UserID", userId);
+            paramDic.Add("@RegionName", regionName);
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_ADD_USER_REGION_P", con, paramDic);
+
+            try
+            {
+                return cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
+        }
+
+        //===============================================TRAVEL PREFERRENCE===============================================//
+
+        public List<string> GetAllTravelPreferencesFromDB()
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+            List<string> preferences = new List<string>();
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_GET_ALL_TRAVEL_PREFERENCES_P", con, paramDic);
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+            try
+            {
+                while (dataReader.Read())
+                {
+                    preferences.Add(dataReader["PreferenceName"].ToString());
+                }
+                return preferences;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
+        }
+
+        public int ClearUserTravelPreferencesFromDB(int userId)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@UserID", userId);
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_CLEAR_USER_TRAVEL_PREFERENCES_P", con, paramDic);
+
+            try
+            {
+                return cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
+        }
+
+        public int AddUserTravelPreferenceToDB(int userId, string preferenceName)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@UserID", userId);
+            paramDic.Add("@PreferenceName", preferenceName);
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_ADD_USER_TRAVEL_PREFERENCE_P", con, paramDic);
+
+            try
+            {
+                return cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
+        }
 
 
         //---------------------------------------------------------------------------------
@@ -1609,4 +2135,3 @@ namespace CountriesProject.DAL
         }
     }
 }
-
