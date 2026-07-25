@@ -212,10 +212,16 @@ namespace CountriesProject.Models
             return dbs.DeleteCountryFromDB(alpha3Code);
         }
 
-        public static List<Country> SearchCountries(string name, string region, string language, string currency, long? minPopulation, long? maxPopulation, double? minArea, double? maxArea, string sortBy, string sortDirection)
+        public static List<Country> SearchCountries(string? name, string? region, string? language, string? currency, long? minPopulation, long? maxPopulation, double? minArea, double? maxArea, string sortBy, string sortDirection)
         {
             DBservices dbs = new DBservices();
             return dbs.SearchCountriesFromDB(name, region, language, currency, minPopulation, maxPopulation, minArea, maxArea, sortBy, sortDirection);
+        }
+
+        public static List<string> GetAllCurrencies()
+        {
+            DBservices dbs = new DBservices();
+            return dbs.GetAllCurrenciesFromDB();
         }
 
         public static List<Country> GetMemoryGameCountries()

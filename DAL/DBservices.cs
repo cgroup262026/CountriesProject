@@ -987,7 +987,7 @@ namespace CountriesProject.DAL
             }
         }
 
-        public List<Country> SearchCountriesFromDB(string name, string region, string language, string currency, long? minPopulation, long? maxPopulation, double? minArea, double? maxArea, string sortBy, string sortDirection)
+        public List<Country> SearchCountriesFromDB(string? name, string? region, string? language, string? currency, long? minPopulation, long? maxPopulation, double? minArea, double? maxArea, string sortBy, string sortDirection)
         {
             SqlConnection con;
             SqlCommand cmd;
@@ -1133,6 +1133,57 @@ namespace CountriesProject.DAL
             catch (Exception ex)
             {
                 throw (ex);
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
+        }
+
+        public List<string> GetAllCurrenciesFromDB()
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+            List<string> currencies = new List<string>();
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            Dictionary<string, object> paramDic =
+                new Dictionary<string, object>();
+
+            cmd = CreateCommandWithStoredProcedureGeneral(
+                "SP_GET_ALL_CURRENCIES_P",
+                con,
+                paramDic
+            );
+
+            SqlDataReader dataReader =
+                cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+            try
+            {
+                while (dataReader.Read())
+                {
+                    currencies.Add(
+                        dataReader["CurrencyName"].ToString()
+                    );
+                }
+
+                return currencies;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
             finally
             {

@@ -37,9 +37,16 @@ namespace CountriesProject.Controllers
 
             if (affectedRows > 0)
             {
-                return Ok("User deleted successfully.");
+                return Ok(new
+                {
+                    message = "User deleted successfully."
+                });
             }
-            return BadRequest("Failed to delete user.");
+
+            return BadRequest(new
+            {
+                message = "Failed to delete user."
+            });
         }
 
         [HttpGet("statistics")]

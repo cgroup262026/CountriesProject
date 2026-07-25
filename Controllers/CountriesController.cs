@@ -24,6 +24,13 @@ namespace CountriesProject.Controllers
             return Ok(countries);
         }
 
+        [HttpGet("currencies")]
+        public IActionResult GetAllCurrencies()
+        {
+            List<string> currencies = Country.GetAllCurrencies();
+            return Ok(currencies);
+        }
+
         [HttpGet("{alpha3Code}")]
         public IActionResult GetCountryByCode(string alpha3Code)
         {
@@ -63,7 +70,7 @@ namespace CountriesProject.Controllers
         }
 
         [HttpGet("search")]
-        public IActionResult SearchCountries(string name = null, string region = null, string language = null, string currency = null, long? minPopulation = null, long? maxPopulation = null, double? minArea = null, double? maxArea = null, string sortBy = "name", string sortDirection = "asc")
+        public IActionResult SearchCountries(string? name = null, string? region = null, string? language = null, string? currency = null, long? minPopulation = null, long? maxPopulation = null, double? minArea = null, double? maxArea = null, string sortBy = "name", string sortDirection = "asc")
         {
             List<Country> countries = Country.SearchCountries(name, region, language, currency, minPopulation, maxPopulation, minArea, maxArea, sortBy, sortDirection);
             return Ok(countries);
