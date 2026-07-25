@@ -2107,6 +2107,285 @@ namespace CountriesProject.DAL
             }
         }
 
+        //===============================================REVIEWS===============================================//
+
+        public List<Review> GetAllReviewsFromDB()
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+            List<Review> reviews = new List<Review>();
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_GET_ALL_REVIEWS_P",con, null);
+
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+            try
+            {
+                while (dataReader.Read())
+                {
+                    Review review = new Review();
+                    review.ReviewId = Convert.ToInt32(dataReader["ReviewID"]);
+                    review.UserID = Convert.ToInt32(dataReader["UserID"]);
+                    review.Alpha3Code = dataReader["Alpha3Code"].ToString();
+                    review.Rating = Convert.ToInt32(dataReader["Rating"]);
+                    review.ReviewText = dataReader["ReviewText"].ToString();
+                    review.PublishDate = Convert.ToDateTime(dataReader["PublishDate"]);
+                    review.FullName = dataReader["FullName"].ToString();
+                    review.ImageUrl = dataReader["ImageUrl"] == DBNull.Value ? "" : dataReader["ImageUrl"].ToString();
+                    review.CountryName = dataReader["CountryName"].ToString();
+                    reviews.Add(review);
+                }
+
+                return reviews;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
+        }
+
+        public List<Review> GetReviewsByCountryFromDB(string alpha3Code)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+            List<Review> reviews = new List<Review>();
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@Alpha3Code", alpha3Code);
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_GET_REVIEWS_BY_COUNTRY_P", con, paramDic);
+
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+            try
+            {
+                while (dataReader.Read())
+                {
+                    Review review = new Review();
+                    review.ReviewId = Convert.ToInt32(dataReader["ReviewID"]);
+                    review.UserID = Convert.ToInt32(dataReader["UserID"]);
+                    review.Alpha3Code = dataReader["Alpha3Code"].ToString();
+                    review.Rating = Convert.ToInt32(dataReader["Rating"]);
+                    review.ReviewText = dataReader["ReviewText"].ToString();
+                    review.PublishDate = Convert.ToDateTime(dataReader["PublishDate"]);
+                    review.FullName = dataReader["FullName"].ToString();
+                    review.ImageUrl = dataReader["ImageUrl"] == DBNull.Value ? "" : dataReader["ImageUrl"].ToString();
+                    review.CountryName = dataReader["CountryName"].ToString();
+                    reviews.Add(review);
+                }
+                return reviews;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
+        }
+
+        public List<Review> GetReviewsByUserFromDB(int userId)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+            List<Review> reviews = new List<Review>();
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@UserID", userId);
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_GET_REVIEWS_BY_USER_P", con, paramDic);
+
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+            try
+            {
+                while (dataReader.Read())
+                {
+                    Review review = new Review();
+                    review.ReviewId = Convert.ToInt32(dataReader["ReviewID"]);
+                    review.UserID = Convert.ToInt32(dataReader["UserID"]);
+                    review.Alpha3Code = dataReader["Alpha3Code"].ToString();
+                    review.Rating = Convert.ToInt32(dataReader["Rating"]);
+                    review.ReviewText = dataReader["ReviewText"].ToString();
+                    review.PublishDate = Convert.ToDateTime(dataReader["PublishDate"]);
+                    review.FullName = dataReader["FullName"].ToString();
+                    review.ImageUrl = dataReader["ImageUrl"] == DBNull.Value ? "" : dataReader["ImageUrl"].ToString();
+                    review.CountryName = dataReader["CountryName"].ToString();
+                    reviews.Add(review);
+                }
+
+                return reviews;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
+        }
+
+        public int InsertReviewToDB(Review review)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@UserID", review.UserID);
+            paramDic.Add("@Alpha3Code", review.Alpha3Code);
+            paramDic.Add("@Rating", review.Rating);
+            paramDic.Add("@ReviewText", review.ReviewText);
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_INSERT_REVIEW_P", con, paramDic);
+
+            try
+            {
+                int numEffected = cmd.ExecuteNonQuery();
+                return numEffected;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
+        }
+
+        public int UpdateReviewInDB(Review review)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@ReviewID", review.ReviewId);
+            paramDic.Add("@UserID", review.UserID);
+            paramDic.Add("@Rating", review.Rating);
+            paramDic.Add("@ReviewText", review.ReviewText);
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_UPDATE_REVIEW_P", con, paramDic);
+
+            try
+            {
+                int numEffected = cmd.ExecuteNonQuery();
+                return numEffected;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
+        }
+
+        public int DeleteReviewFromDB(int reviewId, int userId)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("myProjDB");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@ReviewID", reviewId);
+            paramDic.Add("@UserID", userId);
+
+            cmd = CreateCommandWithStoredProcedureGeneral("SP_DELETE_REVIEW_P", con, paramDic);
+
+            try
+            {
+                int numEffected = cmd.ExecuteNonQuery();
+                return numEffected;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
+        }
+
+
 
         //---------------------------------------------------------------------------------
         // Create the SqlCommand
