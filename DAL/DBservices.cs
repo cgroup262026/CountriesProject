@@ -129,6 +129,7 @@ namespace CountriesProject.DAL
             paramDic.Add("@Email", email);
 
             cmd = CreateCommandWithStoredProcedureGeneral("SP_GET_USER_BY_EMAIL_P", con, paramDic);
+
             SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
 
             try
@@ -157,7 +158,10 @@ namespace CountriesProject.DAL
             }
             finally
             {
-                if (con != null) con.Close();
+                if (con != null)
+                {
+                    con.Close();
+                }
             }
         }
 
@@ -212,7 +216,10 @@ namespace CountriesProject.DAL
             finally
             {
                 if (con != null)
+                {
                     con.Close();
+                }
+                    
             }
         }
 
@@ -320,11 +327,13 @@ namespace CountriesProject.DAL
 
             Dictionary<string, object> paramDic = new Dictionary<string, object>();
             paramDic.Add("@UserID", userId);
+
             cmd = CreateCommandWithStoredProcedureGeneral("SP_GET_USER_HOBBIES_P", con, paramDic);
 
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
             try
-            {
-                SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+            { 
                 while (dataReader.Read())
                 {
                     hobbies.Add(dataReader["HobbyName"].ToString());
@@ -363,11 +372,14 @@ namespace CountriesProject.DAL
 
             Dictionary<string, object> paramDic = new Dictionary<string, object>();
             paramDic.Add("@UserID", userId);
+
             cmd = CreateCommandWithStoredProcedureGeneral("SP_GET_USER_LANGUAGES_P", con, paramDic);
+
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
 
             try
             {
-                SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+                
                 while (dataReader.Read())
                 {
                     UserLanguage language = new UserLanguage();
@@ -409,11 +421,13 @@ namespace CountriesProject.DAL
 
             Dictionary<string, object> paramDic = new Dictionary<string, object>();
             paramDic.Add("@UserID", userId);
+
             cmd = CreateCommandWithStoredProcedureGeneral("SP_GET_USER_REGIONS_P", con, paramDic);
+
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
 
             try
             {
-                SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
                 while (dataReader.Read())
                 {
                     regions.Add(dataReader["RegionName"].ToString());
@@ -452,11 +466,14 @@ namespace CountriesProject.DAL
 
             Dictionary<string, object> paramDic = new Dictionary<string, object>();
             paramDic.Add("@UserID", userId);
+
             cmd = CreateCommandWithStoredProcedureGeneral("SP_GET_USER_TRAVEL_PREFERENCES_P", con, paramDic);
+
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
 
             try
             {
-                SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+                
                 while (dataReader.Read())
                 {
                     preferences.Add(dataReader["PreferenceName"].ToString());
@@ -1053,10 +1070,11 @@ namespace CountriesProject.DAL
 
             cmd = CreateCommandWithStoredProcedureGeneral("SP_GET_ALL_HOBBIES_P", con, null);
 
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+
             try
             {
-                SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
-
                 while (dataReader.Read())
                 {
                     hobbies.Add(dataReader["HobbyName"].ToString());
@@ -1098,9 +1116,11 @@ namespace CountriesProject.DAL
 
             cmd = CreateCommandWithStoredProcedureGeneral("SP_GET_RANDOM_TRIVIA_QUESTIONS_P", con, null);
 
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
             try
             {
-                SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+                
                 while (dataReader.Read())
                 {
                     TriviaQuestion question = new TriviaQuestion();
@@ -1188,9 +1208,11 @@ namespace CountriesProject.DAL
 
             cmd = CreateCommandWithStoredProcedureGeneral("SP_GET_MEMORY_GAME_COUNTRIES_P", con, null);
 
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
             try
             {
-                SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+                
                 while (dataReader.Read())
                 {
                     Country country = new Country();
@@ -1348,10 +1370,11 @@ namespace CountriesProject.DAL
 
             cmd = CreateCommandWithStoredProcedureGeneral("SP_GET_USER_SAVED_COUNTRIES_P", con, paramDic);
 
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
             try
             {
-                SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
-
+     
                 while (dataReader.Read())
                 {
                     Country country = new Country();
@@ -1533,10 +1556,10 @@ namespace CountriesProject.DAL
 
             cmd = CreateCommandWithStoredProcedureGeneral("SP_GET_ADMIN_STATISTICS_P", con, null);
 
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
             try
             {
-                SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
-
                 if (dataReader.Read())
                 {
                     AdminStatistics ads = new AdminStatistics();
