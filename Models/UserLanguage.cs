@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CountriesProject.DAL;
+using System.ComponentModel.DataAnnotations;
 
 namespace CountriesProject.Models
 {
@@ -16,5 +17,22 @@ namespace CountriesProject.Models
 
         public string LanguageName { get => languageName; set => languageName = value; }
         public int ProficiencyLevel { get => proficiencyLevel; set => proficiencyLevel = value; }
+
+        public static List<string> GetAllLanguages()
+        {
+            DBservices dbs = new DBservices();
+            return dbs.GetAllLanguagesFromDB();
+        }
+
+        public static void UpdateUserLanguages(int userId, List<UserLanguage> languages)
+        {
+            DBservices dbs = new DBservices();
+            dbs.ClearUserLanguagesFromDB(userId);
+
+            foreach (UserLanguage language in languages)
+            {
+                dbs.AddUserLanguageToDB(userId, language);
+            }
+        }
     }
 }

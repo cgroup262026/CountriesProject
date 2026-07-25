@@ -91,7 +91,6 @@ namespace CountriesProject.Models
                 user.FavoriteRegions = dbs.GetUserRegionsFromDB(userId);
                 user.TravelPreferences = dbs.GetUserTravelPreferencesFromDB(userId);
             }
-
             return user;
         }
 
@@ -153,6 +152,40 @@ namespace CountriesProject.Models
         {
             DBservices dbs = new DBservices();
             return dbs.GetUserSavedCountriesFromDB(userId, listType);
+        }
+
+        public static List<string> GetAllRegions()
+        {
+            DBservices dbs = new DBservices();
+            return dbs.GetAllRegionsFromDB();
+        }
+
+        public static void UpdateUserRegions(int userId, List<string> regions)
+        {
+            DBservices dbs = new DBservices();
+            dbs.ClearUserRegionsFromDB(userId);
+
+            foreach (string region in regions)
+            {
+                dbs.AddUserRegionToDB(userId, region);
+            }
+        }
+
+        public static List<string> GetAllTravelPreferences()
+        {
+            DBservices dbs = new DBservices();
+            return dbs.GetAllTravelPreferencesFromDB();
+        }
+
+        public static void UpdateUserTravelPreferences(int userId, List<string> preferences)
+        {
+            DBservices dbs = new DBservices();
+            dbs.ClearUserTravelPreferencesFromDB(userId);
+
+            foreach (string preference in preferences)
+            {
+                dbs.AddUserTravelPreferenceToDB(userId, preference);
+            }
         }
     }
 }

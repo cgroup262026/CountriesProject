@@ -34,8 +34,7 @@ namespace CountriesProject.Controllers
         }
 
         //POST api/<CountriesController>
-        [HttpPost]
-        [Route("api/countries/add")]
+        [HttpPost("add")]
         public IActionResult AddCountry([FromBody] Country country)
         {
             int affectedRows = country.Insert();
@@ -44,16 +43,30 @@ namespace CountriesProject.Controllers
             return BadRequest("Failed to add country.");
         }
 
-        // PUT api/<CountriesController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPut("{alpha3Code}")]
+        public IActionResult UpdateCountry(string alpha3Code, [FromBody] Country country)
         {
+            country.Alpha3Code = alpha3Code;
+            int affectedRows = country.Update();
+
+            if (affectedRows > 0) return Ok(country);
+            return NotFound("Country not found.");
         }
 
-        // DELETE api/<CountriesController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpDelete("{alpha3Code}")]
+        public IActionResult DeleteCountry(string alpha3Code)
         {
+            int affectedRows = Country.Delete(alpha3Code);
+
+            if (affectedRows > 0) return Ok("Country deleted successfully.");
+            return NotFound("Country not found.");
+        }
+
+        [HttpGet("search")]
+        public IActionResult SearchCountries(string name = null, string region = null, string language = null, string currency = null, long? minPopulation = null, long? maxPopulation = null, double? minArea = null, double? maxArea = null, string sortBy = "name", string sortDirection = "asc")
+        {
+            List<Country> countries = Country.SearchCountries(name, region, language, currency, minPopulation, maxPopulation, minArea, maxArea, sortBy, sortDirection);
+            return Ok(countries);
         }
 
         [HttpGet("memory-game")]

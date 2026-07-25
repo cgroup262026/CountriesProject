@@ -148,6 +148,7 @@ namespace CountriesProject.Models
         {
             DBservices dbs = new DBservices();
 
+            dbs.InsertRegionToDB(Region);
             int affectedRows = dbs.InsertCountryToDB(this);
 
             if (affectedRows > 0)
@@ -171,6 +172,50 @@ namespace CountriesProject.Models
             }
 
             return affectedRows;
+        }
+
+        public int Update()
+        {
+            DBservices dbs = new DBservices();
+
+            dbs.InsertRegionToDB(Region);
+            int affectedRows = dbs.UpdateCountryInDB(this);
+
+            if (affectedRows > 0)
+            {
+                dbs.ClearCountryDetailsFromDB(Alpha3Code);
+
+                foreach (string currency in Currencies)
+                {
+                    dbs.InsertCurrencyToDB(currency);
+                    dbs.InsertCountryCurrencyToDB(Alpha3Code, currency);
+                }
+
+                foreach (string language in Languages)
+                {
+                    dbs.InsertLanguageToDB(language);
+                    dbs.InsertCountryLanguageToDB(Alpha3Code, language);
+                }
+
+                foreach (string border in Borders)
+                {
+                    dbs.InsertCountryBorderToDB(Alpha3Code, border);
+                }
+            }
+
+            return affectedRows;
+        }
+
+        public static int Delete(string alpha3Code)
+        {
+            DBservices dbs = new DBservices();
+            return dbs.DeleteCountryFromDB(alpha3Code);
+        }
+
+        public static List<Country> SearchCountries(string name, string region, string language, string currency, long? minPopulation, long? maxPopulation, double? minArea, double? maxArea, string sortBy, string sortDirection)
+        {
+            DBservices dbs = new DBservices();
+            return dbs.SearchCountriesFromDB(name, region, language, currency, minPopulation, maxPopulation, minArea, maxArea, sortBy, sortDirection);
         }
 
         public static List<Country> GetMemoryGameCountries()
