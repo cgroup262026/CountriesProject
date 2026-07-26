@@ -1,16 +1,19 @@
 using CountriesProject.DAL;
+using CountriesProject.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddHttpClient<AiService>(client =>
+{
+    client.BaseAddress = new Uri("https://generativelanguage.googleapis.com/v1beta/");
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (true)
 {
     app.UseSwagger();
@@ -19,9 +22,6 @@ if (true)
 
 app.UseHttpsRedirection();
 app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
