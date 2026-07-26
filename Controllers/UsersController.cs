@@ -46,9 +46,13 @@ namespace CountriesProject.Controllers
                 user.PasswordHash = null;// Clear the password hash before returning the user object for security reasons
                 return Ok(user);
             }
-            catch (Exception ex)
+            catch (UnauthorizedAccessException ex)
             {
                 return StatusCode(403, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
             }
         }
 
