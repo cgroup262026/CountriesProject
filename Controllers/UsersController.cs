@@ -58,18 +58,25 @@ namespace CountriesProject.Controllers
 
         // PUT api/<UsersController>/
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] User updatedUser)
+        public IActionResult Put(
+            int id,
+            [FromBody] User updatedUser)
         {
-            updatedUser.UserId = id;
-
-            int affectedRows = updatedUser.UpdateUser();
-
-            if (affectedRows > 0)
+            try
             {
-                return Ok(updatedUser);
-            }
+                User? savedUser = CountriesProject.Models.User.UpdateProfile(id, updatedUser);
 
-            return BadRequest("Update failed.");
+                if (savedUser == null)
+                {
+                    return NotFound("User not found.");
+                }
+
+                return Ok(savedUser);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("{userId}/total-score")]

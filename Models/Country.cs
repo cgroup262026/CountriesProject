@@ -147,6 +147,12 @@ namespace CountriesProject.Models
         public int Insert()
         {
             DBservices dbs = new DBservices();
+            List<Country> countries = dbs.GetAllCountriesFromDB();
+
+            foreach (Country country in countries)
+            {
+                if (country.Alpha3Code == Alpha3Code || country.Alpha2Code == Alpha2Code) return 0;
+            }
 
             dbs.InsertRegionToDB(Region);
             int affectedRows = dbs.InsertCountryToDB(this);

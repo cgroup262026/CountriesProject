@@ -9,12 +9,12 @@ namespace CountriesProject.Models
     public class User
     {
         int userId;
-        string email;
-        string passwordHash;
-        string fullName;
+        string? email;
+        string? passwordHash;
+        string? fullName;
         DateTime birthDate;
-        string gender;
-        string imageUrl;
+        string? gender;
+        string? imageUrl;
         bool isAdmin;
         bool isLocked;
         DateTime registrationDate;
@@ -37,12 +37,12 @@ namespace CountriesProject.Models
         }
 
         public int UserId { get => userId; set => userId = value; }
-        public string Email { get => email; set => email = value; }
-        public string PasswordHash { get => passwordHash; set => passwordHash = value; }
-        public string FullName { get => fullName; set => fullName = value; }
+        public string? Email { get => email; set => email = value; }
+        public string? PasswordHash { get => passwordHash; set => passwordHash = value; }
+        public string? FullName { get => fullName; set => fullName = value; }
         public DateTime BirthDate { get => birthDate; set => birthDate = value; }
-        public string Gender { get => gender; set => gender = value; }
-        public string ImageUrl { get => imageUrl; set => imageUrl = value; }
+        public string? Gender { get => gender; set => gender = value; }
+        public string? ImageUrl { get => imageUrl; set => imageUrl = value; }
         public bool IsAdmin { get => isAdmin; set => isAdmin = value; }
         public bool IsLocked { get => isLocked; set => isLocked = value; }
         public List<string> Hobbies { get => hobbies; set => hobbies = value; }
@@ -100,6 +100,42 @@ namespace CountriesProject.Models
             return dbs.UpdateUserInDB(this);
         }
 
+        public static User? UpdateProfile (int userId, User updatedUser)
+        {
+            User? existingUser = GetUserById(userId);
+
+            if (existingUser == null)
+                return null;
+
+            if (!string.IsNullOrWhiteSpace(updatedUser.FullName))
+                existingUser.FullName = updatedUser.FullName.Trim();
+            
+            if (updatedUser.BirthDate != default)
+            {
+                DateTime birthDate = updatedUser.BirthDate.Date;
+                DateTime today = DateTime.Today;
+                if (birthDate > today)
+                    throw new ArgumentException("Birth date cannot be in the future.");
+
+                if (birthDate > today.AddYears(-13))
+                    throw new ArgumentException("The user must be at least 13 years old.");
+                existingUser.BirthDate = birthDate;
+            }
+
+            if (!string.IsNullOrWhiteSpace(updatedUser.Gender))
+                existingUser.Gender = updatedUser.Gender.Trim();
+
+            if (updatedUser.ImageUrl != null)
+                existingUser.ImageUrl = updatedUser.ImageUrl.Trim();
+
+            int affectedRows = existingUser.UpdateUser();
+
+            if (affectedRows <= 0)
+                throw new InvalidOperationException("The profile could not be updated.");
+
+            return existingUser;
+        }
+
         public static int DeleteOrLockUser(int id)
         {
             DBservices dbs = new DBservices();
@@ -145,7 +181,18 @@ namespace CountriesProject.Models
         public static int DeleteSavedCountry(int userId, string alpha3Code)
         {
             DBservices dbs = new DBservices();
-            return dbs.DeleteUserSavedCountryFromDB(userId, alpha3Code);
+
+            Review? countryReview = Review.GetReviewsByUser(userId).FirstOrDefault(review =>
+                string.Equals(review.Alpha3Code, alpha3Code, StringComparison.OrdinalIgnoreCase));
+
+            int affectedRows = dbs.DeleteUserSavedCountryFromDB(userId, alpha3Code);
+
+            if (affectedRows != 0 && countryReview != null)
+            {
+                Review.Delete(countryReview.ReviewId, userId);
+            }
+
+            return affectedRows;
         }
 
         public static List<Country> GetSavedCountries(int userId, string listType)
