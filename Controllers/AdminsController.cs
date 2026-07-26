@@ -20,9 +20,9 @@ namespace CountriesProject.Controllers
         [HttpPut("users/{id}/lock")]
         public IActionResult UpdateLockStatus(int id, [FromBody] bool isLocked)
         {
-            int affectedRows = CountriesProject.Models.User.UpdateLockStatus(id, isLocked);
+            int numEffected = CountriesProject.Models.User.UpdateLockStatus(id, isLocked);
 
-            if (affectedRows > 0)
+            if (numEffected > 0)
             {
                 return Ok(new { Message = "User lock status updated successfully." });
             }
@@ -33,20 +33,13 @@ namespace CountriesProject.Controllers
         [HttpDelete("users/{id}")]
         public IActionResult DeleteUser(int id)
         {
-            int affectedRows = CountriesProject.Models.User.DeleteOrLockUser(id);
+            int numEffected = CountriesProject.Models.User.DeleteOrLockUser(id);
 
-            if (affectedRows > 0)
+            if (numEffected > 0)
             {
-                return Ok(new
-                {
-                    message = "User deleted successfully."
-                });
+                return Ok(new { message = "User deleted successfully." });
             }
-
-            return BadRequest(new
-            {
-                message = "Failed to delete user."
-            });
+            return BadRequest(new { message = "Failed to delete user."});
         }
 
         [HttpGet("statistics")]
