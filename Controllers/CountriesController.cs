@@ -10,12 +10,6 @@ namespace CountriesProject.Controllers
     [ApiController]
     public class CountriesController : ControllerBase
     {
-        [HttpPost("import")]
-        public async Task<IActionResult> ImportCountries()
-        {
-            int count = await Country.ImportAllCountries();
-            return Ok(new { ImportedCountries = count });
-        }
 
         [HttpGet]
         public IActionResult GetAllCountries()
@@ -44,9 +38,9 @@ namespace CountriesProject.Controllers
         [HttpPost("add")]
         public IActionResult AddCountry([FromBody] Country country)
         {
-            int affectedRows = country.Insert();
+            int numEffected = country.Insert();
 
-            if (affectedRows > 0) return Ok(country);
+            if (numEffected > 0) return Ok(country);
             return BadRequest("Failed to add country.");
         }
 
@@ -54,18 +48,18 @@ namespace CountriesProject.Controllers
         public IActionResult UpdateCountry(string alpha3Code, [FromBody] Country country)
         {
             country.Alpha3Code = alpha3Code;
-            int affectedRows = country.Update();
+            int numEffected = country.Update();
 
-            if (affectedRows > 0) return Ok(country);
+            if (numEffected > 0) return Ok(country);
             return NotFound("Country not found.");
         }
 
         [HttpDelete("{alpha3Code}")]
         public IActionResult DeleteCountry(string alpha3Code)
         {
-            int affectedRows = Country.Delete(alpha3Code);
+            int numEffected = Country.Delete(alpha3Code);
 
-            if (affectedRows > 0) return Ok("Country deleted successfully.");
+            if (numEffected > 0) return Ok("Country deleted successfully.");
             return NotFound("Country not found.");
         }
 

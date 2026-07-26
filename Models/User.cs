@@ -128,9 +128,9 @@ namespace CountriesProject.Models
             if (updatedUser.ImageUrl != null)
                 existingUser.ImageUrl = updatedUser.ImageUrl.Trim();
 
-            int affectedRows = existingUser.UpdateUser();
+            int numEffected = existingUser.UpdateUser();
 
-            if (affectedRows <= 0)
+            if (numEffected <= 0)
                 throw new InvalidOperationException("The profile could not be updated.");
 
             return existingUser;
@@ -185,14 +185,14 @@ namespace CountriesProject.Models
             Review? countryReview = Review.GetReviewsByUser(userId).FirstOrDefault(review =>
                 string.Equals(review.Alpha3Code, alpha3Code, StringComparison.OrdinalIgnoreCase));
 
-            int affectedRows = dbs.DeleteUserSavedCountryFromDB(userId, alpha3Code);
+            int numEffected = dbs.DeleteUserSavedCountryFromDB(userId, alpha3Code);
 
-            if (affectedRows != 0 && countryReview != null)
+            if (numEffected != 0 && countryReview != null)
             {
                 Review.Delete(countryReview.ReviewId, userId);
             }
 
-            return affectedRows;
+            return numEffected;
         }
 
         public static List<Country> GetSavedCountries(int userId, string listType)
