@@ -67,7 +67,7 @@ namespace CountriesProject.Models
 
             if (user == null) return null;
             if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash)) return null;
-            if (user.IsLocked) throw new Exception("User is locked");
+            if (user.IsLocked) throw new UnauthorizedAccessException("User is locked.");
 
             dbs.InsertUserLoginToDB(user.UserId);
             return user;
