@@ -46,8 +46,15 @@ namespace CountriesProject.Controllers
         [HttpPut("{userId}/languages")]
         public IActionResult UpdateUserLanguages(int userId, [FromBody] List<UserLanguage> languages)
         {
-            UserLanguage.UpdateUserLanguages(userId, languages);
-            return Ok("User languages updated successfully.");
+            try
+            {
+                UserLanguage.UpdateUserLanguages(userId, languages);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         [HttpGet("regions")]
@@ -60,8 +67,15 @@ namespace CountriesProject.Controllers
         [HttpPut("{userId}/regions")]
         public IActionResult UpdateUserRegions(int userId, [FromBody] List<string> regions)
         {
-            CountriesProject.Models.User.UpdateUserRegions(userId, regions);
-            return Ok("User regions updated successfully.");
+            try
+            {
+                CountriesProject.Models.User.UpdateUserRegions(userId, regions);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         [HttpGet("travel-preferences")]
@@ -74,8 +88,15 @@ namespace CountriesProject.Controllers
         [HttpPut("{userId}/travel-preferences")]
         public IActionResult UpdateUserTravelPreferences(int userId, [FromBody] List<string> preferences)
         {
-            CountriesProject.Models.User.UpdateUserTravelPreferences(userId, preferences);
-            return Ok("User travel preferences updated successfully.");
+            try
+            {
+                CountriesProject.Models.User.UpdateUserTravelPreferences(userId, preferences);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }
